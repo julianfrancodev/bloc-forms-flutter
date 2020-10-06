@@ -7,7 +7,7 @@ void main(){
     child: MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Bloc Validate',
-      initialRoute: '/',
+      initialRoute: '/second',
       routes: routes,
     ),
   ));
