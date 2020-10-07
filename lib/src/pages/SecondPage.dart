@@ -36,7 +36,7 @@ class _SecondPageState extends State<SecondPage> {
         if (snapshot.hasData) {
           return ListView.builder(
             itemCount: products.length,
-            itemBuilder: (context, i) => _renderItem(context,products[i]),
+            itemBuilder: (context, i) => _renderItem(context, products[i]),
           );
         }
         return CircularProgressIndicator();
@@ -44,20 +44,37 @@ class _SecondPageState extends State<SecondPage> {
     );
   }
 
-  Widget _renderItem(BuildContext context,ProductoModel product) {
+  Widget _renderItem(BuildContext context, ProductoModel product) {
     return Dismissible(
-      key: UniqueKey(),
-      onDismissed: (direction){
-        productsProvider.deleteProduct(product.id);
-      },
-      background: Container(
-        color: Colors.red,
-      ),
-      child: ListTile(
-        title: Text('${product.titulo} - ${product.valor}'),
-        subtitle: Text(product.id),
-        onTap: ()=> Navigator.pushNamed(context, '/product',arguments: product),
-      ),
-    );
+        key: UniqueKey(),
+        onDismissed: (direction) {
+          productsProvider.deleteProduct(product.id);
+        },
+        background: Container(
+          color: Colors.red,
+        ),
+        child: Card(
+          child: Column(
+            children: [
+              (product.fotoUrl == null)
+                  ? Image(
+                      image: AssetImage('assets/images/no-image.png'),
+                    )
+                  : FadeInImage(
+                      image: NetworkImage(product.fotoUrl),
+                      placeholder: AssetImage('assets/images/jar-loading.gif'),
+                      height: 300,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+              ListTile(
+                title: Text('${product.titulo} - ${product.valor}'),
+                subtitle: Text(product.id),
+                onTap: () => Navigator.pushNamed(context, '/product',
+                    arguments: product),
+              ),
+            ],
+          ),
+        ));
   }
 }

@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:bloc_validate_forms/src/models/product_model.dart';
 import 'package:bloc_validate_forms/src/providers/products_provider.dart';
 import 'package:bloc_validate_forms/src/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProductPage extends StatefulWidget {
   @override
@@ -16,6 +19,9 @@ class _ProductPageState extends State<ProductPage> {
 
   ProductoModel producto = new ProductoModel();
   final productProvider = new ProductsProvider();
+
+  File _image;
+  final picker = ImagePicker();
 
 
   @override
@@ -32,8 +38,8 @@ class _ProductPageState extends State<ProductPage> {
         title: Text('Producto'),
         actions: [
           IconButton(
-              icon: Icon(Icons.photo_size_select_actual), onPressed: () {}),
-          IconButton(icon: Icon(Icons.camera_alt), onPressed: () {}),
+              icon: Icon(Icons.photo_size_select_actual), onPressed: _selectPhoto),
+          IconButton(icon: Icon(Icons.camera_alt), onPressed: _takePhoto),
         ],
       ),
       body: SingleChildScrollView(
@@ -43,6 +49,7 @@ class _ProductPageState extends State<ProductPage> {
             key: formKey,
             child: Column(
               children: [
+                _showPhoto(),
                 _renderName(),
                 _renderPrice(),
                 _renderEnabled(),
@@ -111,11 +118,15 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  void _submit() {
+  void _submit() async{
     if (!formKey.currentState.validate()) return;
     formKey.currentState.save();
 
     setState(() {_saving = true;});
+
+    if(_image !=null){
+     producto.fotoUrl = await productProvider.uploadImage(_image);
+    }
 
     if(producto.id == null){
       productProvider.createProduct(producto);
@@ -135,5 +146,54 @@ class _ProductPageState extends State<ProductPage> {
     );
 
     scaffoldKey.currentState.showSnackBar(snack);
+  }
+  Widget _showPhoto(){
+    if(producto.fotoUrl != null){
+      return FadeInImage(
+        image: NetworkImage(producto.fotoUrl),
+        placeholder: AssetImage('assets/images/jar-loading.gif'),
+        height: 300,
+        fit: BoxFit.contain,
+      );
+    }else{
+      return Image(
+        image: AssetImage(_image?.path ?? 'assets/images/no-image.png'),
+        height: 300,
+        fit: BoxFit.cover
+      );
+    }
+  }
+
+
+  _selectPhoto() async{
+    final pickeFile = await picker.getImage(source: ImageSource.gallery);
+
+    if(_image != null){
+      producto.fotoUrl = null;
+    }
+
+    setState(() {
+      if(pickeFile != null){
+        _image = File(pickeFile.path);
+
+      }else{
+        print('No image selected');
+      }
+    });
+  }
+
+  _takePhoto() async{
+    final pickeFile = await picker.getImage(source: ImageSource.camera);
+    if(_image != null){
+      producto.fotoUrl = null;
+    }
+    setState(() {
+      if(pickeFile != null){
+        _image = File(pickeFile.path);
+
+      }else{
+        print('No image selected');
+      }
+    });
   }
 }
