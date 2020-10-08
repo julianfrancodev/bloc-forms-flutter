@@ -3,23 +3,24 @@ import 'package:bloc_validate_forms/src/providers/user_provider.dart';
 import 'package:bloc_validate_forms/src/utils/utils.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _RegisterPageState extends State<RegisterPage> {
+
   final userProvider = new UserProvider();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: Stack(
-      children: [
-        _renderBackground(context),
-        _renderLoginForm(context),
-      ],
-    ));
+          children: [
+            _renderBackground(context),
+            _renderLoginForm(context),
+          ],
+        ));
   }
 
   Widget _renderLoginForm(BuildContext context) {
@@ -32,8 +33,8 @@ class _HomePageState extends State<HomePage> {
         children: [
           SafeArea(
               child: Container(
-            height: 190,
-          )),
+                height: 190,
+              )),
           Container(
             width: size.width * 0.85,
             padding: EdgeInsets.symmetric(vertical: 30),
@@ -65,14 +66,11 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(
                   height: 30,
                 ),
-                _renderButton(bloc, context),
+                _renderButton(bloc,context),
               ],
             ),
           ),
-          FlatButton(
-              onPressed: () =>
-                  Navigator.pushReplacementNamed(context, '/register'),
-              child: Text("Crear una cuenta")),
+          FlatButton(onPressed: ()=> Navigator.pushReplacementNamed(context, '/'), child: Text("Ingresar")),
           SizedBox(
             height: 100,
           )
@@ -138,7 +136,7 @@ class _HomePageState extends State<HomePage> {
         builder: (context, snapshot) {
           return RaisedButton(
             shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
             elevation: 5,
             color: Colors.deepPurple,
             onPressed: snapshot.hasData ? () => _signin(bloc, context) : null,
@@ -154,6 +152,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   _signin(LoginBloc bloc, BuildContext context) async{
+
     Map info = await userProvider.signin(bloc.email, bloc.password);
     if(info['ok']){
       Navigator.pushReplacementNamed(context, '/second');
@@ -161,6 +160,7 @@ class _HomePageState extends State<HomePage> {
     }else{
       showAlert(context, "Credenciales Incorrectas");
     }
+    // Navigator.pushReplacementNamed(context, '/second');
   }
 
   Widget _renderBackground(BuildContext context) {
@@ -170,9 +170,9 @@ class _HomePageState extends State<HomePage> {
       width: double.infinity,
       decoration: BoxDecoration(
           gradient: LinearGradient(colors: [
-        Color.fromRGBO(63, 63, 156, 1),
-        Color.fromRGBO(90, 70, 178, 1),
-      ])),
+            Color.fromRGBO(63, 63, 156, 1),
+            Color.fromRGBO(90, 70, 178, 1),
+          ])),
     );
 
     final circle = Container(
