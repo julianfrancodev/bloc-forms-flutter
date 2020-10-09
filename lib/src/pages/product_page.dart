@@ -1,7 +1,8 @@
 import 'dart:io';
 
+import 'package:bloc_validate_forms/src/bloc/products_bloc.dart';
+import 'package:bloc_validate_forms/src/bloc/provider.dart';
 import 'package:bloc_validate_forms/src/models/product_model.dart';
-import 'package:bloc_validate_forms/src/providers/products_provider.dart';
 import 'package:bloc_validate_forms/src/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class _ProductPageState extends State<ProductPage> {
   bool _saving = false;
 
   ProductoModel producto = new ProductoModel();
-  final productProvider = new ProductsProvider();
+  ProductsBloc productsBloc;
 
   File _image;
   final picker = ImagePicker();
@@ -27,7 +28,10 @@ class _ProductPageState extends State<ProductPage> {
   @override
   Widget build(BuildContext context) {
 
+    productsBloc = Provider.productsBloc(context);
+
     final ProductoModel prodData = ModalRoute.of(context).settings.arguments;
+
 
     if(prodData != null){
       producto = prodData;
@@ -125,13 +129,13 @@ class _ProductPageState extends State<ProductPage> {
     setState(() {_saving = true;});
 
     if(_image !=null){
-     producto.fotoUrl = await productProvider.uploadImage(_image);
+     producto.fotoUrl = await productsBloc.uploadPhoto(_image);
     }
 
     if(producto.id == null){
-      productProvider.createProduct(producto);
+      productsBloc.addProduct(producto);
     }else{
-      productProvider.editProduct(producto);
+      productsBloc.editProduct(producto);
     }
     setState(() {_saving = false;});
     showSnack("Registro guardado");

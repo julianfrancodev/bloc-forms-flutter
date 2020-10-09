@@ -1,6 +1,5 @@
 import 'package:bloc_validate_forms/src/bloc/provider.dart';
 import 'package:bloc_validate_forms/src/models/product_model.dart';
-import 'package:bloc_validate_forms/src/providers/products_provider.dart';
 import 'package:flutter/material.dart';
 
 class SecondPage extends StatefulWidget {
@@ -9,13 +8,14 @@ class SecondPage extends StatefulWidget {
 }
 
 class _SecondPageState extends State<SecondPage> {
-  final productsProvider = new ProductsProvider();
-
   @override
   Widget build(BuildContext context) {
-    final bloc = Provider.of(context);
+    final productsBloc = Provider.productsBloc(context);
+
+    productsBloc.loadProducts();
+
     return Scaffold(
-      body: _renderList(),
+      body: _renderList(productsBloc),
       floatingActionButton: _renderFloatingButton(context),
     );
   }
@@ -27,16 +27,16 @@ class _SecondPageState extends State<SecondPage> {
     );
   }
 
-  Widget _renderList() {
-    return FutureBuilder(
-      future: productsProvider.loadProducts(),
+  Widget _renderList(ProductsBloc productsBloc) {
+    return StreamBuilder(
+      stream: productsBloc.productsStream,
       builder: (context, snapshot) {
         final products = snapshot.data;
 
         if (snapshot.hasData) {
           return ListView.builder(
             itemCount: products.length,
-            itemBuilder: (context, i) => _renderItem(context, products[i]),
+            itemBuilder: (context, i) => _renderItem(context, products[i],productsBloc),
           );
         }
         return CircularProgressIndicator();
@@ -44,11 +44,11 @@ class _SecondPageState extends State<SecondPage> {
     );
   }
 
-  Widget _renderItem(BuildContext context, ProductoModel product) {
+  Widget _renderItem(BuildContext context, ProductoModel product, ProductsBloc productsBloc) {
     return Dismissible(
         key: UniqueKey(),
         onDismissed: (direction) {
-          productsProvider.deleteProduct(product.id);
+          productsBloc.deleteProduct(product.id);
         },
         background: Container(
           color: Colors.red,
